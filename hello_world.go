@@ -26,6 +26,7 @@ func test() {
 
 	message := "yo"
 	message = "this works"
+	//message = 1 //this not
 
 	println(message)
 }
