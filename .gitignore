@@ -1,0 +1,12 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea
+.idea/*
+*.iml
+/.settings/
+/.classpath
+/.project
+/target/
+/logs/
+/.gradle/
+/gradle*
+/build/
