@@ -1,0 +1,1 @@
+https://gabrieltanner.org/blog/collecting-prometheus-metrics-in-golang/
