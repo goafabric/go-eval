@@ -1,10 +1,12 @@
 package main
 
 import (
-    "web-service/service"
+	"github.com/gin-gonic/gin"
+	"web-service/service"
 )
 
-
 func main() {
-    service.Route()
+	var router = gin.Default()
+	service.Route(router)
+	router.Run("localhost:50200")
 }
