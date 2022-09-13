@@ -3,7 +3,7 @@ package service
 import (
     "net/http"
     "github.com/gin-gonic/gin"
-    "web-service/dto"
+    "web-service/service/dto"
 )
 
 var albums = []dto.Album{
