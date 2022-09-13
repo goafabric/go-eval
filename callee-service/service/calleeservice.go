@@ -5,17 +5,19 @@ import (
 	"net/http"
 )
 
-func sayMyName(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK,
-		Callee{Message: "Heisenberg"})
-}
-
-func sayMyOtherName(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK,
-		Callee{Message: "Slim Shady"})
-}
-
 func Route(router *gin.Engine) {
 	router.GET("/callees/sayMyName", sayMyName)
 	router.GET("/callees/sayMyOtherName", sayMyOtherName)
+}
+
+func sayMyName(c *gin.Context) {
+	var name = c.Request.URL.Query().Get("name")
+	c.IndentedJSON(http.StatusOK,
+		Callee{Message: name})
+}
+
+func sayMyOtherName(c *gin.Context) {
+	var name = c.Request.URL.Query().Get("name")
+	c.IndentedJSON(http.StatusOK,
+		Callee{Message: name})
 }
