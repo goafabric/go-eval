@@ -1,16 +1,16 @@
 package main
 
 import (
-	parent "family/father"
-	child "family/father/son"
+	"family/father"
+	"family/father/son"
 
 	"fmt"
 )
 
 func main() {
-	f := new(parent.Father)
+	f := new(father.Father)
 	fmt.Println(f.Data("Mr. Jeremy Maclin"))
 
-	c := new(child.Son)
+	c := new(son.Son)
 	fmt.Println(c.Data("Riley Maclin"))
 }
