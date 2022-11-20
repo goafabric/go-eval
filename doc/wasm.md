@@ -1,4 +1,6 @@
 # links
+https://wasmbyexample.dev/examples/wasi-hello-world/wasi-hello-world.go.en-us.html
+
 https://tinygo.org/getting-started/install/
 https://github.com/WebAssembly/binaryen
 https://wasmtime.dev
