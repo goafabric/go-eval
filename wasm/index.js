@@ -34,7 +34,7 @@ const runWasmAdd = async () => {
   const importObject = go.importObject;
 
   // Instantiate our wasm module
-  const wasmModule = await wasmBrowserInstantiate("./main.wasm", importObject);
+  const wasmModule = await wasmBrowserInstantiate("./main.go.wasm", importObject);
 
   // Allow the wasm_exec go instance, bootstrap and execute our wasm module
   go.run(wasmModule.instance);
