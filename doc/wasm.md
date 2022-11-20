@@ -9,7 +9,8 @@ function tinygo-wasm() { docker run --rm -v $(pwd):/src tinygo/tinygo:0.26.0 tin
 function tinygo-run() { docker run --rm -v $(pwd):/src tinygo/tinygo:0.26.0 tinygo run /src/$1 }
 
 # run
-
+tinygo-wasm main.go
+wasmtime main.go.wasm
 
 # go command
 GOOS=js GOARCH=wasm go build -o main.wasm main.go
