@@ -45,6 +45,6 @@ const runWasmAdd = async () => {
 
   // Set the result onto the body
   document.body.textContent = `Hello World! addResult: ${addResult}`;
-  document.body.textContent = `Hello World! ${myName}`;
+  //document.body.textContent = `Hello World! ${myName}`;
 };
 runWasmAdd();
