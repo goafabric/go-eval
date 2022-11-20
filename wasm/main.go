@@ -10,7 +10,13 @@ func main() {}
 // And returns a 32-bit integer value.
 // To make this function callable from JavaScript,
 // we need to add the: "export add" comment above the function
+
 //export add
 func add(x int, y int) int {
   return x + y;
+}
+
+//export sayMyName
+func sayMyName(name string) string {
+    return "My name is: " + name
 }
