@@ -12,14 +12,16 @@ export PATH=~/tinygo/bin:~/tinygo/binaryen/bin:$PATH
 sudo xattr -r -d com.apple.quarantine ~/tinygo
 
 # command
-cat ./main.go
-tinygo build -wasm-abi=generic -target=wasi -o main.wasm main.go
+# tinygo build -wasm-abi=generic -target=wasi -o main.wasm main.go
+           
+docker run --rm -v $(pwd):/src tinygo/tinygo:0.26.0 tinygo build -target=wasi -o /src/main.wasm /src/main.go
 wasmtime --dir . main.wasm
 
-# command
+docker run --rm -v $(pwd):/src tinygo/tinygo:0.26.0 tinygo build -target=wasi -o /src/restservice.wasm /src/restservice.go
+wasmtime --dir . main.wasm
+
+
+# go command
 GOOS=js GOARCH=wasm go build -o main.wasm main.go
 
 
-# error
-
-error: could not find wasm-opt, set the WASMOPT environment variable to override
