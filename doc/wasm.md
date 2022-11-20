@@ -14,7 +14,10 @@ cat ./main.go
 tinygo build -wasm-abi=generic -target=wasi -o main.wasm main.go
 wasmtime --dir . main.wasm
 
-         
+# command
+GOOS=js GOARCH=wasm go build -o main.wasm main.go
+
+
 # error
 
 error: could not find wasm-opt, set the WASMOPT environment variable to override
