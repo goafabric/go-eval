@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY callee-service ./
 
+ADD ./static ./static
+
 CMD ./callee-service
 
 EXPOSE 50900
