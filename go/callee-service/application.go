@@ -12,5 +12,5 @@ func main() {
 	service.Route(router)
 
 	router.Use(static.Serve("/", static.LocalFile("./static", false)))
-	router.Run("localhost:50900")
+	router.Run("0.0.0.0:50900")
 }
