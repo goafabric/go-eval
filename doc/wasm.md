@@ -15,4 +15,7 @@ wasmtime main.go.wasm
 # go command
 GOOS=js GOARCH=wasm go build -o main.wasm main.go
 
+# ssl off
+export GOINSECURE=*  && export GONOPROXY=*  && export GIT_SSL_NO_VERIFY=true
+
 
