@@ -18,4 +18,6 @@ GOOS=js GOARCH=wasm go build -o main.wasm main.go
 # ssl off
 export GOINSECURE=*  && export GONOPROXY=*  && export GIT_SSL_NO_VERIFY=true
 
+# string pass
+https://www.wasm.builders/k33g_org/an-essay-on-the-bi-directional-exchange-of-strings-between-the-wasm-module-with-tinygo-and-nodejs-with-wasi-support-3i9h
 
