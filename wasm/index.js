@@ -51,8 +51,8 @@ const runWasmAdd = async () => {
     const myName = toString(wasmModule, helloStringPosition)
 
     // Set the result onto the body
-    document.body.textContent = `Addresult: ${addResult}`;
-    document.body.textContent += ` - ${myName}`;
+    //document.body.textContent = `Addresult: ${addResult}`;
+    document.body.textContent = ` - ${myName}`;
 };
 
 runWasmAdd();
