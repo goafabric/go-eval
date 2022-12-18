@@ -1,0 +1,3 @@
+FROM scratch
+COPY ./saymyname.wasm /saymyname.wasm
+ENTRYPOINT [ "saymyname.wasm" ]

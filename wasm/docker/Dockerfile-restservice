@@ -1,0 +1,3 @@
+FROM scratch
+COPY ./restservice.wasm /restservice.wasm
+ENTRYPOINT [ "restservice.wasm" ]
