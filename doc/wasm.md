@@ -24,6 +24,7 @@ https://www.wasm.builders/k33g_org/an-essay-on-the-bi-directional-exchange-of-st
 # docker
 https://docs.docker.com/desktop/wasm/
 
-docker run --rm -p 8080:8080 --name=wasm-example --runtime=io.containerd.wasmedge.v1 --platform=wasi/wasm32 michaelirwin244/wasm-example
+docker run --rm --name=saymname --runtime=io.containerd.wasmedge.v1 --platform=wasi/wasm32 goafabric/saymname:1.0.0
 
+docker run --rm -p 8080:8080 --name=wasm-example --runtime=io.containerd.wasmedge.v1 --platform=wasi/wasm32 michaelirwin244/wasm-example
 curl http://localhost:8080
