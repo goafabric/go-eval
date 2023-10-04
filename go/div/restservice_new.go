@@ -1,7 +1,7 @@
 package main
 
-import "net"
 import "net/http"
+import "net"
 
 func main() {
     println("starting to serve you on http://localhost:8080/hello")
