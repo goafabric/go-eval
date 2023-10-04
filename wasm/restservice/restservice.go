@@ -1,12 +1,12 @@
 package main
 
 import "net/http"
-import "net"
+import "github.com/stealthrocket/net/wasip1"
 
 func main() {
     println("starting to serve you on http://localhost:8080/hello")
 
-    listener, err := net.Listen("tcp", ":8080")
+    listener, err := wasip1.Listen("tcp", ":8080")
     if err != nil { panic(err) }
 
     server := &http.Server {
