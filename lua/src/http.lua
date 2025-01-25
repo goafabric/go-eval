@@ -1,3 +1,4 @@
+-- does not work outside http environment server, luarocks install lua-resty-http  
 local http = require("resty.http")
 
 local function make_request()
