@@ -1,6 +1,6 @@
 package main
 
-import "callee-service/controller"
+import calleeController "callee-service/controller"
 import "gofr.dev/pkg/gofr"
 
 type Callee struct {
@@ -15,7 +15,7 @@ type Health struct {
 func main() {
     app := gofr.New()
 
-    controller.Route(app)
+    calleeController.Route(app)
 
     app.AddStaticFiles("/", "./static")
     app.Run()

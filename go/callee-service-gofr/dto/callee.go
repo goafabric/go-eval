@@ -1,4 +1,4 @@
-package controller
+package dto
 
 type Callee struct {
     ID      string `json:"id"`
