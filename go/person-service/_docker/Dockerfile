@@ -5,7 +5,7 @@ WORKDIR /app
 ADD ./static ./static
 ADD ./configs ./configs
 
-COPY callee-service ./
-CMD ./callee-service
+COPY person-service ./
+CMD ./person-service
 
-EXPOSE 50900
+EXPOSE 50800
