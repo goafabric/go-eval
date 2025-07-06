@@ -1,4 +1,5 @@
 #!/bin/bash
+cd ..
 GOOS=linux GOARCH=arm64 go build .
 docker build -f docker/Dockerfile --tag goafabric/callee-service-go:1.0.1 .
 docker push goafabric/callee-service-go:1.0.1
