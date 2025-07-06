@@ -1,8 +1,6 @@
-package persistence
+package person
 
 import (
-	"person-service/controller/dto"
-
 	"github.com/google/uuid"
 	"gofr.dev/pkg/gofr"
 )
@@ -18,12 +16,12 @@ func DemoData(ctx *gofr.Context) error {
 		return nil
 	}
 
-	err2 := save(ctx, dto.Person{ID: uuid.New().String(), OrganizationId: "1", FirstName: "Homer", LastName: "Simpson"})
-	save(ctx, dto.Person{ID: uuid.New().String(), OrganizationId: "1", FirstName: "Bart", LastName: "Simpson"})
+	err2 := save(ctx, Person{ID: uuid.New().String(), OrganizationId: "1", FirstName: "Homer", LastName: "Simpson"})
+	save(ctx, Person{ID: uuid.New().String(), OrganizationId: "1", FirstName: "Bart", LastName: "Simpson"})
 	return err2
 }
 
-func save(ctx *gofr.Context, person dto.Person) error {
+func save(ctx *gofr.Context, person Person) error {
 	_, err := ctx.SQL.ExecContext(ctx, "INSERT INTO example_0.person (id, organization_id, first_name, last_name) VALUES ($1, $2, $3, $4)",
 		person.ID, person.OrganizationId, person.FirstName, person.LastName)
 
