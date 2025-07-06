@@ -1,6 +1,6 @@
 package logic
 
-import "callee-service/dto"
+import "callee-service/controller/dto"
 
 func SayMyName(name string) dto.Callee {
 	return dto.Callee{ID: "0", Message: "Your name is: " + name}

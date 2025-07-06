@@ -1,7 +1,7 @@
 package controller
 
 import "gofr.dev/pkg/gofr"
-import "callee-service/dto"
+import "callee-service/controller/dto"
 
 func RouteHealth(app *gofr.App) {
     app.GET("/actuator/health", func(ctx *gofr.Context) (interface{}, error) {
