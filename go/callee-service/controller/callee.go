@@ -1,4 +1,4 @@
-package service
+package controller
 
 type Callee struct {
 	Message string `json:"message"`

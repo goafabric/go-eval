@@ -1,7 +1,7 @@
 package main
 
 import (
-	"callee-service/service"
+	"callee-service/controller"
 
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
@@ -9,7 +9,7 @@ import (
 
 func main() {
 	var router = gin.Default()
-	service.Route(router)
+	controller.Route(router)
 
 	router.Use(static.Serve("/", static.LocalFile("./static", false)))
 	router.Run("0.0.0.0:50900")
