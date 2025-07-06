@@ -3,20 +3,15 @@ package main
 import (
 	"gofr.dev/pkg/gofr"
 
-	controller "callee-service/controller"
+	controller "person-service/controller"
 
-	extensions "callee-service/extensions"
-
-	persistence "callee-service/persistence"
+	extensions "person-service/extensions"
 )
 
 func main() {
 	app := gofr.New()
 
-	controller.RouteCallee(app)
-	controller.RouteHealth(app)
-
-	persistence.RoutePerson(app)
+	controller.RoutePerson(app)
 
 	app.UseMiddleware(extensions.PreHandle())
 

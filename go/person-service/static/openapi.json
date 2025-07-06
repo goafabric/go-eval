@@ -11,17 +11,66 @@
     }
   ],
   "paths": {
-    "/callees/save": {
+    "/persons": {
+      "get": {
+        "tags": [
+          "person-controller"
+        ],
+        "operationId": "find",
+        "parameters": [
+          {
+            "name": "personSearch",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PersonSearch"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Person"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
-          "callee-controller"
+          "person-controller"
         ],
         "operationId": "save",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Callee"
+                "$ref": "#/components/schemas/Person"
               }
             }
           },
@@ -33,7 +82,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Callee"
+                  "$ref": "#/components/schemas/Person"
                 }
               }
             }
@@ -41,15 +90,15 @@
         }
       }
     },
-    "/callees/sayMyOtherName/{name}": {
+    "/persons/{id}": {
       "get": {
         "tags": [
-          "callee-controller"
+          "person-controller"
         ],
-        "operationId": "sayMyOtherName",
+        "operationId": "getById",
         "parameters": [
           {
-            "name": "name",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -63,7 +112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Callee"
+                  "$ref": "#/components/schemas/Person"
                 }
               }
             }
@@ -71,10 +120,61 @@
         }
       }
     },
-    "/callees/sayMyName": {
+    "/persons/street": {
       "get": {
         "tags": [
-          "callee-controller"
+          "person-controller"
+        ],
+        "operationId": "findByStreet",
+        "parameters": [
+          {
+            "name": "street",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Person"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/persons/name": {
+      "get": {
+        "tags": [
+          "person-controller"
         ],
         "operationId": "sayMyName",
         "parameters": [
@@ -93,7 +193,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Callee"
+                  "$ref": "#/components/schemas/Person"
                 }
               }
             }
@@ -104,13 +204,72 @@
   },
   "components": {
     "schemas": {
-      "Callee": {
+      "Address": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string"
           },
-          "message": {
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "street": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 3,
+            "pattern": "[a-zA-Z0-9.\\s]*"
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 3
+          }
+        },
+        "required": [
+          "city",
+          "street"
+        ]
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "firstName": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 3
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 3
+          },
+          "address": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Address"
+            }
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName"
+        ]
+      },
+      "PersonSearch": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
             "type": "string"
           }
         }
