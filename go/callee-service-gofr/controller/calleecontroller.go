@@ -1,22 +1,17 @@
 package controller
 
 import "gofr.dev/pkg/gofr"
-import "callee-service/dto"
-import calleeLogic "callee-service/logic"
+import logic "callee-service/logic"
 
-func Route(app *gofr.App) {
-    app.GET("/actuator/health", func(ctx *gofr.Context) (interface{}, error) {
-		return dto.Health{Status: "OK"}, nil
-	})
-
+func RouteCallee(app *gofr.App) {
     app.GET("/callees/sayMyName", func(ctx *gofr.Context) (interface{}, error) {
 		name := ctx.Param("name")
-		return calleeLogic.SayMyName(name), nil
+		return logic.SayMyName(name), nil
 	})
 
 	app.GET("/callees/sayMyOtherName/{name}", func(ctx *gofr.Context) (interface{}, error) {
 		name := ctx.PathParam("name")
-		return calleeLogic.SayMyOtherName(name), nil
+		return logic.SayMyOtherName(name), nil
 	})
 
     /*
