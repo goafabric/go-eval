@@ -10,7 +10,14 @@ func DemoData(ctx *gofr.Context) (error) {
     if err != nil {
         return err
     }
+
+    rows, _ := ctx.SQL.QueryContext(ctx, "SELECT * FROM example_0.person")
+    if (rows.Next()) {
+        return nil
+    }
+
     err2 := save(ctx, Person{ID: uuid.New().String(), OrganizationId: "1", FirstName: "Homer", LastName: "Simpson"})
+    save(ctx, Person{ID: uuid.New().String(), OrganizationId: "1", FirstName: "Bart", LastName: "Simpson"})
     return err2
 }
 
