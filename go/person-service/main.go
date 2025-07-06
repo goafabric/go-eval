@@ -6,6 +6,8 @@ import (
 	controller "callee-service/controller"
 
 	extensions "callee-service/extensions"
+
+	persistence "callee-service/persistence"
 )
 
 func main() {
@@ -13,6 +15,8 @@ func main() {
 
 	controller.RouteCallee(app)
 	controller.RouteHealth(app)
+
+	persistence.RoutePerson(app)
 
 	app.UseMiddleware(extensions.PreHandle())
 
