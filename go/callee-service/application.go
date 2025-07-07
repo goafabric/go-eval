@@ -1,16 +1,20 @@
 package main
 
 import (
-	"callee-service/controller"
+	"gofr.dev/pkg/gofr"
 
-	"github.com/gin-contrib/static"
-	"github.com/gin-gonic/gin"
+	"callee-service/callee"
+
+	extensions "callee-service/extensions"
 )
 
 func main() {
-	var router = gin.Default()
-	controller.Route(router)
+	app := gofr.New()
 
-	router.Use(static.Serve("/", static.LocalFile("./static", false)))
-	router.Run("0.0.0.0:50900")
+	callee.RouteCallee(app)
+
+	app.UseMiddleware(extensions.PreHandle())
+
+	app.AddStaticFiles("/", "./static")
+	app.Run()
 }
