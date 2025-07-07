@@ -1,0 +1,3 @@
+- migrations with gofr
+- gorm orm framework
+- adapter rest calls with circuit breaker
