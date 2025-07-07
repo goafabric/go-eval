@@ -1,20 +1,18 @@
-package controller
+package callee
 
 import (
-	logic "callee-service/logic"
-
 	"gofr.dev/pkg/gofr"
 )
 
 func RouteCallee(app *gofr.App) {
 	app.GET("/callees/sayMyName", func(ctx *gofr.Context) (interface{}, error) {
 		name := ctx.Param("name")
-		return logic.SayMyName(name), nil
+		return SayMyName(name), nil
 	})
 
 	app.GET("/callees/sayMyOtherName/{name}", func(ctx *gofr.Context) (interface{}, error) {
 		name := ctx.PathParam("name")
-		return logic.SayMyOtherName(name), nil
+		return SayMyOtherName(name), nil
 	})
 
 	/*

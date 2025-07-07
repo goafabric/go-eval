@@ -1,6 +1,6 @@
-package dto
+package callee
 
 type Callee struct {
-    ID      string `json:"id"`
+	ID      string `json:"id"`
 	Message string `json:"message"`
 }
