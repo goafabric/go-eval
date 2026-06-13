@@ -1,6 +1,9 @@
 
+from pathlib import Path
+
 from fastapi import APIRouter, FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from callee_service.config import settings
@@ -24,6 +27,9 @@ async def readiness() -> JSONResponse:
 
 
 def register_monitoring(app: FastAPI) -> None:
-    """Wire up the monitoring router and Prometheus instrumentation."""
+    """Wire up the monitoring router, Prometheus instrumentation, and static files."""
     app.include_router(router)
     Instrumentator().instrument(app).expose(app, endpoint=settings.prometheus_path)
+
+    static_dir = Path(__file__).parent.parent / "static"
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")

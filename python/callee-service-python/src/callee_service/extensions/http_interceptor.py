@@ -48,5 +48,5 @@ def _configure_tracing() -> None:
         span.set_attribute("tenant.id", user_context.get_tenant_id())
 
 
-def register_middleware(app: FastAPI) -> None:
+def register_http_interceptor(app: FastAPI) -> None:
     app.add_middleware(HttpInterceptorMiddleware)

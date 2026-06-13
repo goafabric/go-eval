@@ -1,10 +1,8 @@
 import logging
 import logging.config
-from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from opentelemetry import trace
 # from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 # from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
@@ -18,7 +16,7 @@ from callee_service.controller.callee_controller import router as callee_router
 # ---------------------------------------------------------------------------
 from callee_service.extensions import user_context
 from callee_service.extensions.exception_handler import register_exception_handlers
-from callee_service.extensions.http_interceptor import register_middleware
+from callee_service.extensions.http_interceptor import register_http_interceptor
 from callee_service.extensions.monitoring_extension import register_monitoring
 
 
@@ -69,20 +67,17 @@ def create_app() -> FastAPI:
     )
 
     # Middleware (request/response filter — equiv. HttpInterceptor)
-    register_middleware(app)
+    register_http_interceptor(app)
 
     # Exception handlers (equiv. ExceptionHandler)
     register_exception_handlers(app)
 
+    # Monitoring: health endpoints, Prometheus metrics, and static files
+    register_monitoring(app)
+
     # Routers
     app.include_router(callee_router)
 
-    # Monitoring: health endpoints + Prometheus metrics
-    register_monitoring(app)
-
-    # Static files — serves index.html at / (equiv. META-INF/resources)
-    static_dir = Path(__file__).parent / "static"
-    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
     # Auto-instrument FastAPI spans with OTel
     #FastAPIInstrumentor.instrument_app(app)
