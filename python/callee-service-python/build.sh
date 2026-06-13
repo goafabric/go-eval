@@ -1,3 +1,3 @@
 #!/bin/bash
 container build -t docker.io/goafabric/callee-service-python:1.0.1-SNAPSHOT . && container image push docker.io/goafabric/callee-service-python:1.0.1-SNAPSHOT
-docker run --name callee-service --rm -p 50900:50900 docker.io/goafabric/callee-service-python:1.0.1-SNAPSHOT
+container run --name callee-service --rm -p 50900:50900 docker.io/goafabric/callee-service-python:1.0.1-SNAPSHOT
