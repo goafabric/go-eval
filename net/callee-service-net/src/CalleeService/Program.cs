@@ -2,8 +2,11 @@ using GoaFabric.CalleeService.Extensions;
 using GoaFabric.CalleeService.Logic;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Prometheus;
 using Serilog;
+using Serilog.Enrichers.Span;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,7 @@ builder.Host.UseSerilog((ctx, cfg) =>
     cfg.ReadFrom.Configuration(ctx.Configuration)
        .Enrich.FromLogContext()
        .Enrich.WithThreadId()
+       .Enrich.WithSpan()
        .WriteTo.Console(
            outputTemplate: "{Timestamp:HH:mm:ss} {Level:u5} tenantId={TenantId} [{TraceId}] [{SourceContext}] ({ThreadId}) {Message:lj}{NewLine}{Exception}"
        ));
@@ -44,6 +48,16 @@ builder.Services.AddMcpServer()
 
 // ── Prometheus metrics ────────────────────────────────────────────────────────
 builder.Services.AddSingleton<IMetricFactory>(_ => Metrics.DefaultFactory);
+
+// ── OpenTelemetry tracing ─────────────────────────────────────────────────────
+var appName = builder.Configuration["ApplicationName"] ?? builder.Environment.ApplicationName;
+var otlpEndpoint = builder.Configuration["Otel:Exporter:Otlp:Traces:Endpoint"] ?? "http://localhost:4317";
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(r => r.AddService(appName))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddOtlpExporter(o => o.Endpoint = new Uri(otlpEndpoint)));
 
 // ── Build ─────────────────────────────────────────────────────────────────────
 var app = builder.Build();
