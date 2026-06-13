@@ -1,29 +1,15 @@
-"""
-Equivalent of Application.kt
-
-FastAPI application entry point. Wires together:
-- Configuration (pydantic-settings)
-- Middleware (HttpInterceptor)
-- Exception handlers (ExceptionHandler)
-- Routers (CalleeController)
-- Monitoring: health endpoints, Prometheus metrics
-- Tracing: OpenTelemetry OTLP
-"""
-
 import logging
 import logging.config
 from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from opentelemetry import trace
 # from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 # from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from prometheus_fastapi_instrumentator import Instrumentator
 
 from callee_service.config import settings
 from callee_service.controller.callee_controller import router as callee_router
@@ -33,6 +19,7 @@ from callee_service.controller.callee_controller import router as callee_router
 from callee_service.extensions import user_context
 from callee_service.extensions.exception_handler import register_exception_handlers
 from callee_service.extensions.http_interceptor import register_middleware
+from callee_service.extensions.monitoring_extension import register_monitoring
 
 
 class TenantIdFilter(logging.Filter):
@@ -90,21 +77,8 @@ def create_app() -> FastAPI:
     # Routers
     app.include_router(callee_router)
 
-    # Prometheus metrics — equiv. quarkus-micrometer-registry-prometheus
-    Instrumentator().instrument(app).expose(app, endpoint=settings.prometheus_path)
-
-    # Health endpoints — equiv. quarkus-smallrye-health at /actuator/health
-    @app.get(settings.health_path, tags=["monitoring"], include_in_schema=False)
-    async def health() -> JSONResponse:
-        return JSONResponse({"status": "UP"})
-
-    @app.get(f"{settings.health_path}/liveness", tags=["monitoring"], include_in_schema=False)
-    async def liveness() -> JSONResponse:
-        return JSONResponse({"status": "UP"})
-
-    @app.get(f"{settings.health_path}/readiness", tags=["monitoring"], include_in_schema=False)
-    async def readiness() -> JSONResponse:
-        return JSONResponse({"status": "UP"})
+    # Monitoring: health endpoints + Prometheus metrics
+    register_monitoring(app)
 
     # Static files — serves index.html at / (equiv. META-INF/resources)
     static_dir = Path(__file__).parent / "static"
