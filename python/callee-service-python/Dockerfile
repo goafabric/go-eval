@@ -29,4 +29,4 @@ ENV PYTHONPATH="/app/src"
 
 EXPOSE 50900
 
-CMD ["uvicorn", "callee_service.main:app", "--host", "0.0.0.0", "--port", "50900"]
+CMD ["uvicorn", "callee_service.main:app", "--host", "0.0.0.0", "--port", "50900", "--workers", "4"]
