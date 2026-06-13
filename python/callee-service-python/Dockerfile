@@ -16,7 +16,7 @@ COPY src/ src/
 RUN uv sync --no-dev
 
 # ---------------------------------------------------------------------------
-FROM python:3.12-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 WORKDIR /app
 
@@ -30,5 +30,3 @@ ENV PYTHONPATH="/app/src"
 EXPOSE 50900
 
 CMD ["uvicorn", "callee_service.main:app", "--host", "0.0.0.0", "--port", "50900"]
-
-#
