@@ -3,12 +3,6 @@ import logging.config
 
 import uvicorn
 from fastapi import FastAPI
-from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from callee_service.config import settings
 from callee_service.controller.callee_controller import router as callee_router
@@ -41,18 +35,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 
-def _setup_tracing() -> None:
-    if not settings.otel_enabled:
-        return
-    resource = Resource.create({"service.name": settings.app_name})
-    provider = TracerProvider(resource=resource)
-    exporter = OTLPSpanExporter(endpoint=settings.otel_exporter_otlp_endpoint, insecure=True)
-    provider.add_span_processor(BatchSpanProcessor(exporter))
-    trace.set_tracer_provider(provider)
-
-
 def create_app() -> FastAPI:
-    _setup_tracing()
 
     app = FastAPI(
         title=settings.app_name,
@@ -68,7 +51,6 @@ def create_app() -> FastAPI:
     app.include_router(callee_router)
 
     register_monitoring(app)
-    FastAPIInstrumentor.instrument_app(app)
 
     return app
 
