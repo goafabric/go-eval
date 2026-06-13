@@ -14,7 +14,6 @@ your real OIDC/JWT validation as needed.
 import logging
 
 from fastapi import APIRouter, Depends
-from fastapi.security import HTTPBearer
 
 from callee_service.controller.dto.callee import Callee
 from callee_service.logic.callee_logic import CalleeLogic
@@ -22,9 +21,6 @@ from callee_service.logic.callee_logic import CalleeLogic
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/callees", tags=["callees"])
-
-_bearer_scheme = HTTPBearer(auto_error=False)
-
 
 @router.get("/sayMyName", summary="Say my name")
 async def say_my_name(
