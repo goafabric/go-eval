@@ -1,0 +1,43 @@
+# ── Native AOT build ──────────────────────────────────────────────────────────
+# Equivalent of the Quarkus GraalVM native image build.
+# Produces a self-contained native binary (~minimal memory footprint).
+#
+# Build: docker build -f Dockerfile.native -t goafabric/callee-service-net:<version> .
+#
+# NOTE: Native AOT requires all dependencies to support trimming.
+#       The project is configured with PublishAot=true in the .csproj when this
+#       target is used. Verify compatibility before enabling in production.
+# ─────────────────────────────────────────────────────────────────────────────
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
+WORKDIR /src
+
+# Install native AOT prerequisites
+RUN apk add --no-cache clang musl-dev build-base zlib-dev
+
+COPY src/CalleeService/CalleeService.csproj src/CalleeService/
+RUN dotnet restore src/CalleeService/CalleeService.csproj
+
+COPY . .
+RUN dotnet publish src/CalleeService/CalleeService.csproj \
+        --configuration Release \
+        --runtime linux-musl-x64 \
+        --self-contained true \
+        -p:PublishAot=true \
+        --output /app/publish
+
+# ── Stage 2: Minimal runtime image ───────────────────────────────────────────
+FROM alpine:3.21 AS runtime
+WORKDIR /app
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+COPY --from=build /app/publish/CalleeService .
+
+ENV ASPNETCORE_URLS=http://+:50900
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+EXPOSE 50900
+
+ENTRYPOINT ["./CalleeService"]
