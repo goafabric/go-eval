@@ -4,10 +4,11 @@ import logging.config
 import uvicorn
 from fastapi import FastAPI
 from opentelemetry import trace
-# from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-# from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from callee_service.config import settings
 from callee_service.controller.callee_controller import router as callee_router
@@ -45,14 +46,9 @@ def _setup_tracing() -> None:
         return
     resource = Resource.create({"service.name": settings.app_name})
     provider = TracerProvider(resource=resource)
-    #exporter = OTLPSpanExporter(endpoint=settings.otel_exporter_otlp_endpoint, insecure=True)
-    #provider.add_span_processor(BatchSpanProcessor(exporter))
+    exporter = OTLPSpanExporter(endpoint=settings.otel_exporter_otlp_endpoint, insecure=True)
+    provider.add_span_processor(BatchSpanProcessor(exporter))
     trace.set_tracer_provider(provider)
-
-
-# ---------------------------------------------------------------------------
-# Application factory
-# ---------------------------------------------------------------------------
 
 
 def create_app() -> FastAPI:
@@ -66,21 +62,13 @@ def create_app() -> FastAPI:
         openapi_url="/openapi",
     )
 
-    # Middleware (request/response filter — equiv. HttpInterceptor)
     register_http_interceptor(app)
-
-    # Exception handlers (equiv. ExceptionHandler)
     register_exception_handlers(app)
 
-    # Monitoring: health endpoints, Prometheus metrics, and static files
-    register_monitoring(app)
-
-    # Routers
     app.include_router(callee_router)
 
-
-    # Auto-instrument FastAPI spans with OTel
-    #FastAPIInstrumentor.instrument_app(app)
+    register_monitoring(app)
+    FastAPIInstrumentor.instrument_app(app)
 
     return app
 
