@@ -19,22 +19,20 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+# from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+# from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from callee_service.config import settings
 from callee_service.controller.callee_controller import router as callee_router
-from callee_service.extensions.exception_handler import register_exception_handlers
-from callee_service.extensions.http_interceptor import register_middleware
-
 # ---------------------------------------------------------------------------
 # Logging — includes tenantId in every log record via a custom filter
 # ---------------------------------------------------------------------------
 from callee_service.extensions import user_context
+from callee_service.extensions.exception_handler import register_exception_handlers
+from callee_service.extensions.http_interceptor import register_middleware
 
 
 class TenantIdFilter(logging.Filter):
@@ -62,8 +60,8 @@ def _setup_tracing() -> None:
         return
     resource = Resource.create({"service.name": settings.app_name})
     provider = TracerProvider(resource=resource)
-    exporter = OTLPSpanExporter(endpoint=settings.otel_exporter_otlp_endpoint, insecure=True)
-    provider.add_span_processor(BatchSpanProcessor(exporter))
+    #exporter = OTLPSpanExporter(endpoint=settings.otel_exporter_otlp_endpoint, insecure=True)
+    #provider.add_span_processor(BatchSpanProcessor(exporter))
     trace.set_tracer_provider(provider)
 
 
@@ -113,7 +111,7 @@ def create_app() -> FastAPI:
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
     # Auto-instrument FastAPI spans with OTel
-    FastAPIInstrumentor.instrument_app(app)
+    #FastAPIInstrumentor.instrument_app(app)
 
     return app
 
