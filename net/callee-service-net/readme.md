@@ -1,1 +1,1 @@
-dotnet run --project src/CalleeService/CalleeService.csproj
+dotnet2 run --project src/CalleeService/CalleeService.csproj
