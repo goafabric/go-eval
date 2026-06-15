@@ -8,10 +8,10 @@ namespace GoaFabric.CalleeService.Logic;
 /// </summary>
 public class CalleeLogic
 {
-    public Callee SayMyName(string? name)
+    public Callee SayMyName(string name)
         => new("0", $"Your name is: {name}");
 
-    public Callee SayMyOtherName(string? name)
+    public Callee SayMyOtherName(string name)
         => new("0", $"Your other name is: {name}");
 
     public Callee Save(Callee callee)
