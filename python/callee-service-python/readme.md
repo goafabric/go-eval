@@ -5,7 +5,7 @@ docker build -t goafabric/callee-service-python:1.0.0-SNAPSHOT . && docker push 
 docker run --name callee-service --rm -p 50900:50900 goafabric/callee-service-python:1.0.0-SNAPSHOT
 
 # python scaling
-- a single python worker leads to: 66 MB / 100% CPU / 1804 req/s
+- a single python worker leads to: 66 MB / 100% CPU / 1804 req/s  (which is 1/8 of java, go, c#...)
 - spawning "--workers 4" workers" leads to: 290 MB / 400% CPU / 4500 req/s
 => so while memory and cpu is just 4*, the req/s do not scale the same way
 
