@@ -47,7 +47,7 @@ def register_monitoring(app: FastAPI) -> None:
     Instrumentator().instrument(app).expose(app, endpoint=settings.prometheus_path)
 
     setup_tracing()
-    FastAPIInstrumentor.instrument_app(app)
+    #FastAPIInstrumentor.instrument_app(app)
 
     static_dir = Path(__file__).parent.parent / "static"
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
