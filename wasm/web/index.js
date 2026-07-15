@@ -1,58 +1,28 @@
-// https://github.com/torch2424/wasm-by-example/blob/master/demo-util/
-export const wasmBrowserInstantiate = async (wasmModuleUrl, importObject) => {
-    let response = undefined;
+const go = new Go(); // Defined in wasm_exec.js
 
-    // Check if the browser supports streaming instantiation
+const runWasm = async () => {
+    let wasmModule;
+
     if (WebAssembly.instantiateStreaming) {
-    // Fetch the module, and instantiate it as it is downloading
-    response = await WebAssembly.instantiateStreaming(
-      fetch(wasmModuleUrl),
-      importObject
-    );
+        wasmModule = await WebAssembly.instantiateStreaming(
+            fetch("../saymyname/saymyname.wasm"),
+            go.importObject
+        );
     } else {
-    // Fallback to using fetch to download the entire module
-    // And then instantiate the module
-    const fetchAndInstantiateTask = async () => {
-      const wasmArrayBuffer = await fetch(wasmModuleUrl).then(response =>
-        response.arrayBuffer()
-      );
-      return WebAssembly.instantiate(wasmArrayBuffer, importObject);
-    };
-
-    response = await fetchAndInstantiateTask();
+        const buf = await fetch("./saymyname.wasm").then(r => r.arrayBuffer());
+        wasmModule = await WebAssembly.instantiate(buf, go.importObject);
     }
 
-    return response;
-};
-
-function toString(wasmModule, stringPosition) {
-    const memory = wasmModule.instance.exports.memory;
-    const extractedBuffer = new Uint8Array(memory.buffer, stringPosition, 30);
-    return new TextDecoder("utf8").decode(extractedBuffer);
-}
-
-const go = new Go(); // Defined in wasm_exec.js. Don't forget to add this in your index.html.
-
-const runWasmAdd = async () => {
-    // Get the importObject from the go instance.
-    const importObject = go.importObject;
-
-    // Instantiate our wasm module
-    const wasmModule = await wasmBrowserInstantiate("../saymyname/saymyname.wasm", importObject);
-
-    // Allow the wasm_exec go instance, bootstrap and execute our wasm module
+    // Start the Go runtime (registers globals: add, sayMyName)
     go.run(wasmModule.instance);
 
-    // Call the Add function export from wasm, save the result
-    const addResult = wasmModule.instance.exports.add(24, 24);
+    // Give the Go runtime one tick to register the JS globals
+    await new Promise(resolve => setTimeout(resolve, 0));
 
-    // Call the sayMyname function
-    const helloStringPosition = wasmModule.instance.exports.sayMyName()
-    const myName = toString(wasmModule, helloStringPosition)
+    const addResult = window.add(24, 24);
+    const myName = window.sayMyName("Slim Shady");
 
-    // Set the result onto the body
-    //document.body.textContent = `Addresult: ${addResult}`;
-    document.body.textContent = ` - ${myName}`;
+    document.body.textContent = `add(24,24) = ${addResult} | ${myName}`;
 };
 
-runWasmAdd();
+runWasm();
