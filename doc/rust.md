@@ -7,3 +7,6 @@ rustup self uninstall
 
 # http server
 https://dev.to/steadylearner/how-to-use-rust-warp-web-framework-2b4e
+
+# build
+cargo build --release   
