@@ -9,4 +9,11 @@ rustup self uninstall
 https://dev.to/steadylearner/how-to-use-rust-warp-web-framework-2b4e
 
 # build
-cargo build --release   
+cargo build --release
+
+# loco
+https://github.com/loco-rs/loco
+cargo install loco && cargo install sea-orm-cli
+/Users/andreas/.cargo/bin/loco new
+cd myapp
+cargo loco start
