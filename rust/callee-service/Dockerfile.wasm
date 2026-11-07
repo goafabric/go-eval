@@ -1,0 +1,4 @@
+# image that contains only the wasm component, run by a containerd wasm shim (see deploy-kind-wasm.sh)
+FROM scratch
+COPY dist/callee-service.wasm /callee-service.wasm
+ENTRYPOINT ["/callee-service.wasm"]
