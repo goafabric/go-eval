@@ -19,16 +19,24 @@ The binary is cross-compiled on the host to a static linux (musl) executable and
 
 
 ## WASI
-The same code also builds as a WASI 0.2 component (`wasm32-wasip2`). The host owns the socket and calls the component once per request through `wasi:http` (via `wstd-axum`), so there is no `tokio` networking in this build.
+The same code also builds as a WASI 0.2 component (`wasm32-wasip2`). The host owns the socket and calls the component once per request through `wasi:http` (via `wstd-axum`), so there is no `tokio` networking in this build. The component is built from the lib (`src/lib.rs`) as `cdylib`, so it only exports `wasi:http/incoming-handler`.
 
     rustup target add wasm32-wasip2
-    cargo build --release --target wasm32-wasip2
-    wasmtime serve -Scli --addr 0.0.0.0:50900 target/wasm32-wasip2/release/callee-service.wasm
+    cargo rustc --lib --release --target wasm32-wasip2 --crate-type cdylib
+    wasmtime serve -Scli --addr 0.0.0.0:50900 target/wasm32-wasip2/release/callee_service.wasm
 
 Differences to the native build:
 - `PORT` is ignored, the listen address is the host's (`--addr`).
 - No OpenTelemetry export (no OTLP/gRPC client, no background threads). Logging works, an incoming `traceparent` is not exported.
 - `wasmtime serve` creates a fresh instance per request, so there is no state between requests.
+
+### Kubernetes (kind), native wasm
+    ./deploy-kind-wasm.sh
+    curl 'http://localhost:30800/callees/sayMyName?name=Heisenberg'
+
+The image only contains the `.wasm` (`Dockerfile.wasm`), the node's containerd runs it with the [runwasi](https://github.com/containerd/runwasi) wasmtime shim through `RuntimeClass` `wasmtime` (`k8s/callee-service-wasm.yaml`). The script installs the shim into the `kind-control-plane` node once and pushes the image to the local registry `localhost:5001`. The Service is a NodePort on `30800`, which this kind cluster maps to the host.
+- The shim serves the component on port `8080` (`WASMTIME_HTTP_PROXY_SOCKET_ADDR` changes it).
+- `kubectl logs` shows nothing, the component's stdout is not forwarded in this mode.
 
 ## Configuration
 Environment variables only:

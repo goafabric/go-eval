@@ -1,38 +1,5 @@
-mod controller;
-#[allow(dead_code)]
-mod extensions;
-mod logic;
-
-use std::sync::Arc;
-
-use axum::Router;
-use axum::http::header::CONTENT_TYPE;
-use axum::routing::get;
-
-use controller::callee_controller::CalleeController;
-use controller::health_controller;
-use logic::callee_logic::CalleeLogic;
-
-const INDEX_HTML: &str = include_str!("../resources/static/index.html");
-const BOOTSTRAP_CSS: &str = include_str!("../resources/static/css/bootstrap.min.css");
-const FAVICON: &[u8] = include_bytes!("../resources/static/favicon.ico");
-
-fn static_resources() -> Router {
-    Router::new()
-        .route("/", get(|| async { ([(CONTENT_TYPE, "text/html; charset=utf-8")], INDEX_HTML) }))
-        .route("/css/bootstrap.min.css", get(|| async { ([(CONTENT_TYPE, "text/css")], BOOTSTRAP_CSS) }))
-        .route("/favicon.ico", get(|| async { ([(CONTENT_TYPE, "image/x-icon")], FAVICON) }))
-}
-
-fn app() -> Router {
-    let callee_logic = Arc::new(CalleeLogic);
-    let callee_controller = Arc::new(CalleeController::new(callee_logic));
-
-    callee_controller
-        .routes()
-        .merge(health_controller::routes())
-        .merge(static_resources())
-}
+// native entry point only, the wasi component is the lib (src/lib.rs)
+#![cfg_attr(target_os = "wasi", no_main)]
 
 #[cfg(not(target_os = "wasi"))]
 const DEFAULT_PORT: u16 = 50900;
@@ -44,8 +11,8 @@ async fn main() {
 
     use tracing::info;
 
-    let tracer_provider = extensions::telemetry::init();
-    let app = app();
+    let tracer_provider = callee_service::extensions::telemetry::init();
+    let app = callee_service::app();
 
     let port = std::env::var("PORT")
         .ok()
@@ -63,12 +30,4 @@ async fn main() {
         .expect("server error");
 
     let _ = tracer_provider.shutdown();
-}
-
-/// The wasi host (e.g. `wasmtime serve`) owns the socket and calls this component once per request.
-#[cfg(target_os = "wasi")]
-#[wstd_axum::http_server]
-fn main() -> Router {
-    extensions::telemetry::init();
-    app()
 }

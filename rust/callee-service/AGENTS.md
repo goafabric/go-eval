@@ -9,16 +9,19 @@ Prometheus metrics and MCP are intentionally out of scope for now. OpenAPI/Swagg
 - Release build: `cargo build --release`
 - Docker image: `./build-image.sh` cross-compiles a static musl binary (linker `rust-lld`, see `.cargo/config.toml`) and packs it into a `scratch` image (`Dockerfile`). The build context is only `dist/`. Don't add dependencies that need a C compiler or system libraries (e.g. `openssl`), or the cross build breaks.
 
-- WASI component: `cargo build --release --target wasm32-wasip2`, run with `wasmtime serve -Scli --addr 127.0.0.1:50900 target/wasm32-wasip2/release/callee-service.wasm`.
+- WASI component: `cargo rustc --lib --release --target wasm32-wasip2 --crate-type cdylib`, run with `wasmtime serve -Scli --addr 127.0.0.1:50900 target/wasm32-wasip2/release/callee_service.wasm`.
+- Wasm in the local kind cluster: `./deploy-kind-wasm.sh` (native wasm via the containerd runwasi wasmtime shim, see README).
 
 Keep the build warning-free, for the native and the `wasm32-wasip2` target.
 
 ## WASI target
 `target_os = "wasi"` gets a different entry point and telemetry, everything else is shared.
-- `main.rs`: `app()` builds the router for both. Native `main` binds a `TcpListener`; the wasi `main` is `#[wstd_axum::http_server]` and returns the router, the host serves it (invoked once per request).
+- `lib.rs`: holds the module tree and `app()` (the router) for both. Its wasi `main` is `#[wstd_axum::http_server]` and returns the router, the host serves it (invoked once per request).
+- `main.rs`: native entry only (`TcpListener`), `no_main` on wasi. The wasi component is built from the lib as `cdylib` so it exports only `wasi:http/incoming-handler`; a bin also exports `wasi:cli/run`, and the runwasi shim picks the first of the two it finds, so it would treat the component as a command and fail to link `wasi:http`.
 - `telemetry.rs`: wasi only sets up logging (no OTLP/gRPC exporter, no batch threads).
 - `Cargo.toml`: `axum` runs with `default-features = false`; `http1`/`tokio`, `tokio` networking and `opentelemetry-otlp` are only in the `cfg(not(target_os = "wasi"))` table. Don't add `axum` or `tokio` features that need sockets or threads to the shared table, and no `hyper`/`tonic`/`reqwest` there.
 - `cargo test` only runs natively.
+- `deploy-kind-wasm.sh` / `Dockerfile.wasm` / `k8s/callee-service-wasm.yaml`: the image is `scratch` + the `.wasm` and is labelled with the node's platform (not `wasi/wasm`), otherwise the node's containerd refuses to pull it ("no match for platform"). The script installs the shim into the kind node once and edits its `/etc/containerd/config.toml`, a recreated cluster needs the script run again.
 
 ## Structure
 The layout mirrors the Kotlin service, so keep the same split when adding code:
