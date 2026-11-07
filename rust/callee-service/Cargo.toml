@@ -4,20 +4,31 @@ version = "1.0.0"
 edition = "2024"
 
 [dependencies]
-axum = "0.8.9"
+axum = { version = "0.8.9", default-features = false, features = ["json", "matched-path", "original-uri", "query"] }
 base64 = "0.23.1"
 opentelemetry = "0.33.1"
 opentelemetry-http = "0.33.1"
-opentelemetry-otlp = { version = "0.33.1", features = ["grpc-tonic"] }
-opentelemetry_sdk = { version = "0.33.1", features = ["rt-tokio"] }
+opentelemetry_sdk = "0.33.1"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
-tokio = { version = "1.54.1", features = ["macros", "net", "rt-multi-thread", "signal"] }
+tokio = { version = "1.54.1", features = ["macros", "rt"] }
 tracing = "0.1.44"
 tracing-opentelemetry = "0.34.0"
 tracing-subscriber = "0.3.23"
 utoipa = { version = "6.0.0", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "10.0.2", features = ["axum", "vendored"] }
+
+# native: own http server, OTLP/gRPC trace export
+[target.'cfg(not(target_os = "wasi"))'.dependencies]
+axum = { version = "0.8.9", default-features = false, features = ["http1", "tokio"] }
+opentelemetry-otlp = { version = "0.33.1", features = ["grpc-tonic"] }
+opentelemetry_sdk = { version = "0.33.1", features = ["rt-tokio"] }
+tokio = { version = "1.54.1", features = ["net", "rt-multi-thread", "signal"] }
+
+# wasi: the host provides the http server (wasi:http), e.g. `wasmtime serve`
+[target.'cfg(target_os = "wasi")'.dependencies]
+wstd = "0.6.8"
+wstd-axum = "0.6.8"
 
 [dev-dependencies]
 tower = { version = "0.5.3", features = ["util"] }

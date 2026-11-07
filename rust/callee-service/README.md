@@ -18,6 +18,18 @@ The binary is cross-compiled on the host to a static linux (musl) executable and
     docker run --name callee-service --rm -p 50900:50900 goafabric/callee-service-rust:1.0.0
 
 
+## WASI
+The same code also builds as a WASI 0.2 component (`wasm32-wasip2`). The host owns the socket and calls the component once per request through `wasi:http` (via `wstd-axum`), so there is no `tokio` networking in this build.
+
+    rustup target add wasm32-wasip2
+    cargo build --release --target wasm32-wasip2
+    wasmtime serve -Scli --addr 0.0.0.0:50900 target/wasm32-wasip2/release/callee-service.wasm
+
+Differences to the native build:
+- `PORT` is ignored, the listen address is the host's (`--addr`).
+- No OpenTelemetry export (no OTLP/gRPC client, no background threads). Logging works, an incoming `traceparent` is not exported.
+- `wasmtime serve` creates a fresh instance per request, so there is no state between requests.
+
 ## Configuration
 Environment variables only:
 - `PORT`: listen port (default `50900`)

@@ -3,20 +3,15 @@ mod controller;
 mod extensions;
 mod logic;
 
-use std::net::SocketAddr;
 use std::sync::Arc;
 
 use axum::Router;
 use axum::http::header::CONTENT_TYPE;
 use axum::routing::get;
-use tracing::info;
 
 use controller::callee_controller::CalleeController;
 use controller::health_controller;
-use extensions::telemetry;
 use logic::callee_logic::CalleeLogic;
-
-const DEFAULT_PORT: u16 = 50900;
 
 const INDEX_HTML: &str = include_str!("../resources/static/index.html");
 const BOOTSTRAP_CSS: &str = include_str!("../resources/static/css/bootstrap.min.css");
@@ -29,17 +24,28 @@ fn static_resources() -> Router {
         .route("/favicon.ico", get(|| async { ([(CONTENT_TYPE, "image/x-icon")], FAVICON) }))
 }
 
-#[tokio::main]
-async fn main() {
-    let tracer_provider = telemetry::init();
-
+fn app() -> Router {
     let callee_logic = Arc::new(CalleeLogic);
     let callee_controller = Arc::new(CalleeController::new(callee_logic));
 
-    let app = callee_controller
+    callee_controller
         .routes()
         .merge(health_controller::routes())
-        .merge(static_resources());
+        .merge(static_resources())
+}
+
+#[cfg(not(target_os = "wasi"))]
+const DEFAULT_PORT: u16 = 50900;
+
+#[cfg(not(target_os = "wasi"))]
+#[tokio::main]
+async fn main() {
+    use std::net::SocketAddr;
+
+    use tracing::info;
+
+    let tracer_provider = extensions::telemetry::init();
+    let app = app();
 
     let port = std::env::var("PORT")
         .ok()
@@ -57,4 +63,12 @@ async fn main() {
         .expect("server error");
 
     let _ = tracer_provider.shutdown();
+}
+
+/// The wasi host (e.g. `wasmtime serve`) owns the socket and calls this component once per request.
+#[cfg(target_os = "wasi")]
+#[wstd_axum::http_server]
+fn main() -> Router {
+    extensions::telemetry::init();
+    app()
 }
