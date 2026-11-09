@@ -12,7 +12,7 @@ use axum::routing::get;
 use tracing::info;
 
 use controller::callee_controller::CalleeController;
-use controller::health_controller;
+use extensions::health_controller;
 use extensions::telemetry;
 use logic::callee_logic::CalleeLogic;
 
